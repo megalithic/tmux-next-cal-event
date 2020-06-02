@@ -91,3 +91,4 @@ main() {
   print_event
 }
 main
+exit 0
