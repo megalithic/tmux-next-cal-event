@@ -56,34 +56,25 @@ no_cal_event_icon() {
   printf "$(get_tmux_option "$no_cal_event_icon_option_string" "$(no_cal_event_icon_default)")"
 }
 
-event_from_cal() {
-  current_time=$(date +%H:%M)
-  next_events=$(icalBuddy -n -npn -nc -b "" -iep "title,datetime" -ps "|=|" -po "datetime,title" \  -tf "=%H:%M" -df "" -eed eventsToday+)
-  event=$(echo $next_events | head -n 1)
+next_event() {
+  event=$(/usr/local/bin/icalBuddy -n -li 1 -npn -nc -b "" -iep "title,datetime" -ps "|=|" -po "datetime,title" -tf "=%H:%M" -df "" -eed eventsToday+)
   event_time=$(echo $event | awk -F "=" '{print substr($2,0,5)}')
+  event_title=$(echo $event | awk -F "=" '{print $3}')
 
-  if [[ "$current_time" < "$time" ]]; then
-    event_title=$(echo $event | awk -F "=" '{print $3}')
-    echo "$event_title @ $event_time"
-  else
+  if [[ -z $event ]]
+  then
     echo ""
+  else
+    echo "$event_title @ $event_time"
   fi
 }
 
-next_event() {
-  next_event=$(/usr/local/bin/icalBuddy -n -li 1 -iep title,datetime -ic 'Calendar,Personal Calendar' -ps '/|/' eventsToday+1 | sed 's/^.*(\\(.*\\)).*uid: \\(.*\\)$/\\1|\\2/' | awk -F "|" '{print substr($1,3,10) "@ " substr($2,10,8)}')
-
-  printf "$next_event"
-}
-
 print_event() {
-  next_event = $(next_event)
-
-  if [[ -z "$next_event" ]]
+  if [[ -z $(next_event) ]]
   then
     echo "$(no_cal_event_icon)"
   else
-    echo "$(cal_event_icon) $next_event"
+    echo "$(cal_event_icon) $(next_event)"
   fi
 }
 
