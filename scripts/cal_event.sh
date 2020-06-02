@@ -4,14 +4,14 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cal_event_icon_option_string="@cal_event_icon"
 no_cal_icon_event_option_string="@no_cal_event_icon"
-cal_option_string="@cal"
+calendars_option_string="@calendars"
 
 cal_event_icon_osx=""
 cal_event_icon=""
 no_cal_event_icon_osx=""
 no_cal_event_icon=""
-cal_osx="Calendar"
-cal="Calendar"
+calendars_osx="Calendar"
+calendars="Calendar"
 
 source $CURRENT_DIR/shared.sh
 
@@ -35,16 +35,16 @@ no_cal_event_icon_default() {
   fi
 }
 
-cal_default() {
+calendars_default() {
   if is_macos; then
-    echo "$cal_osx"
+    echo "$calendars_osx"
   else
-    echo "$cal"
+    echo "$calendars"
   fi
 }
 
-cal() {
-  printf "$(get_tmux_option "$cal_option_string" "$(cal_default)")"
+calendars() {
+  printf "$(get_tmux_option "$calendars_option_string" "$(calendars_default)")"
 }
 
 cal_event_icon() {
@@ -71,7 +71,7 @@ event_from_cal() {
 }
 
 next_event() {
-  next_event=$(/usr/local/bin/icalBuddy -n -li 1 -iep title,datetime -ic 'Calendar,Personal Calendar' -ps '/|/' eventsToday+1 | sed 's/^.*(\\(.*\\)).*uid: \\(.*\\)$/\\1|\\2/' | awk -F "|" '{print substr($1,3,10) "@ " substr($2,10,8)}')
+  next_event=$(/usr/local/bin/icalBuddy -n -li 1 -iep title,datetime -ic '$(calendars)' -ps '/|/' eventsToday+1 | sed 's/^.*(\\(.*\\)).*uid: \\(.*\\)$/\\1|\\2/' | awk -F "|" '{print substr($1,3,10) "@ " substr($2,10,8)}')
 
   printf "$next_event"
 }
